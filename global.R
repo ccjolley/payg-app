@@ -3,6 +3,7 @@ library(shiny)
 library(shinydashboard)
 library(dplyr)
 library(reshape2)
+library(RJSONIO) # don't know why, but I needed this to deploy on shinyapps.io
 source('utils.R')
 source('read-GSMA.R')
 source('read-findex.R')
