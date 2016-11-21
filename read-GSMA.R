@@ -30,7 +30,7 @@ get_gsma <- function(fname,yrs) {
                   'CountryName','SurveyYear')
   res
 }
-dirroot <- 'C:/Users/Craig/Desktop/Live projects/Pay-go solar/hh survey data/GSMA/'
+dirroot <- 'data/GSMA/'
 africa <- c('BJ','BF','BU','CM','CV','CF','TD','CG','CD','CI','EK','ER',
             'ET','GA','GM','GH','GN','KE','LS','LB','MD','MW','ML','MZ','NM',
             'NI','NG','RW','SN','SL','ZA','SD','SZ','TZ','TG','UG','ZM','ZW')

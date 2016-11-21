@@ -12,9 +12,7 @@
 library(tidyr)
 library(dplyr)
 
-oldwd <- getwd()
-setwd("C:/Users/Craig/Desktop/Live projects/Pay-go solar/hh survey data/Global Findex")
-gf <- read.csv('00d7fbe8-2939-4a51-8972-efb244252327_Data.csv',
+gf <- read.csv('data/00d7fbe8-2939-4a51-8972-efb244252327_Data.csv',
                encoding="UTF-8",stringsAsFactors=FALSE)
 
 names(gf) <- c('country_name','country_code','series_name','series_code',
@@ -46,7 +44,6 @@ gf_wide <- gf_clean %>%
 key <- gf %>% select(series_name,series_code) %>% unique
 
 rm(gf,gf_w1,gf_w2,just1)
-setwd(oldwd)
 
 ###############################################################################
 # Focus on Power Africa countries (add to interest list as needed)
