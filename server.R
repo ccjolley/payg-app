@@ -1,15 +1,8 @@
 library(shiny)
 library(dplyr)
 library(ggplot2)
-library(llamar)
 library(scales)
 library(forcats)
-source('utils.R')
-source('read-GSMA.R')
-source('read-findex.R')
-# TODO: Eventually, it will make more sense to pre-process the GSMA indicators
-# I care about into a single CSV rather than working with the original GSMA
-# files every time. 
 
 ###############################################################################
 # Plot of electricification rates for selected countries based on DHS API.
@@ -37,9 +30,12 @@ elec_plot <- function(clist) {
 # TODO: add dashed line for forecast to legend
 ###############################################################################
 gsma_plot <- function(clist,var=0) {
+  if (length(clist)==0 | is.null(var)) { return(NULL) }
   gsma_data <- plyr::ldply(clist, function(x) 
-    get_gsma(paste0(dirroot,x,'.csv'),2000:2020)) %>% na.omit
- if (var==1) {
+    get_gsma(paste0(dirroot,x,'.csv'),2000:2020)) %>% 
+    na.omit %>% 
+    mutate(CountryName=gsub('C\\?te','Cote',CountryName))
+  if (var==1) {
     gsma_data$plotme <- gsma_data[,'penetration_uniq']
     text='Penetration, unique subscribers'
   } else if (var==2) {
@@ -68,27 +64,33 @@ gsma_plot <- function(clist,var=0) {
 
 ###############################################################################
 # Plot of Global Findex variables
-# TODO: make $barcolor depend on whether it's a country or a grouping
 ###############################################################################
-findex_plot <- function(clist,code='WP14887_7.1') {
-  gf_focus <- gf_wide[gf_wide$country_name %in% clist,] 
-  tmp <- data.frame()
-  for (c in clist) {
-    tmp <- rbind(tmp,data.frame(country=c,value=gf_focus[gf_focus$country_name==c,code]))
-  }
-  tmp <- tmp %>% 
-    mutate(country = as.character(country),
-           country = ifelse(country=='High income: OECD','OECD high income',country),
-           country = ifelse(country=='Sub-Saharan Africa (developing only)','SS Africa',country))
+findex_plot <- function(clist,rlist,code='WP14887_7.1') {
+  if (length(c(clist,rlist))==0) { return(NULL) }
+  tmp <- plyr::ldply(c(clist,rlist),function(c) {
+    v <- gf_wide[gf_wide$country_name==c,code]
+    r <- ifelse(c %in% rlist,1,0)
+    data.frame(country=c,value=v,region=r)
+  }) %>% 
+    mutate(plotorder = rank(value) + (1-region)*1000,
+           region = as.factor(region)) %>%
+    na.omit
   title <- key[key$series_code==code,'series_name'] %>% 
-    gsub(' \\[w2\\]','',.)
+    gsub(' \\[.*\\]','',.) %>%
+    gsub(' \\(.*\\)','',.)
   tmp$text <- round(tmp$value) %>% paste0('%')
-  tmp$barcolor <- as.factor(1)
-  thresh <- max(tmp$value,na.rm=TRUE)/5
-  ggplot(tmp,aes(x=fct_rev(fct_inorder(country)),y=value)) +
-    geom_bar(stat='identity',aes(fill=barcolor)) +
-    geom_text(aes(label=text,y=ifelse(value>thresh,value,thresh)),hjust=-0.1) +
-    geom_text(aes(label=country,y=0.5),hjust=0) +
+  text_df <- tmp %>% 
+    mutate(x=fct_reorder(country,plotorder)) %>%
+    select(country,text,value,x) %>% 
+    mutate(text=as.character(text),country=as.character(country)) %>%
+    melt(id.vars=c('value','x'),value.name='plotme') %>%
+    mutate(hjust=ifelse(variable=='country',0,-0.1),
+           y=ifelse(variable=='country',max(value)/40,value),
+           plotme=as.character(plotme)) %>%
+    select(plotme,hjust,x,y)
+  ggplot(tmp,aes(x=fct_reorder(country,plotorder),y=value)) +
+    geom_bar(stat='identity',aes(fill=region)) +
+    geom_text(data=text_df,aes(x=x,y=y,hjust=hjust,label=plotme),check_overlap=TRUE) +
     coord_flip() +
     ggtitle(title) +
     theme_classic() +
@@ -98,18 +100,69 @@ findex_plot <- function(clist,code='WP14887_7.1') {
           legend.position = "none")
 }
 
-findex_plot(c('Kenya','Mali','Niger'))
+#findex_plot(c('Finland','Burkina Faso'),c('Low & middle income','Sub-Saharan Africa (developing only)'))
+
 
 ###############################################################################
 # Here's where all the real action is
 ###############################################################################
+initial_countries <- c('Nigeria','Uganda','Tanzania','Zambia','Rwanda')
 
 shinyServer(function(input, output) {
+  country_choices <- reactive({
+    if (input$panelID == 'Findex indicators') {
+      all_choices <- gf_wide[!is.na(gf_wide[,input$findex_var]),'country_name']
+      setdiff(all_choices,gf_regions)
+    } else if (input$panelID == 'Household electrification') {
+      dhs_names
+    } else if (input$panelID == 'Mobile adoption') {
+      gsma_names
+    }
+  })
+  last_countries <- reactive({
+    if (length(input$clist)==0) {
+      initial_countries
+    } else {
+      input$clist
+    }
+  })
+  region_choices <- reactive({
+    if (input$panelID == 'Findex indicators') {
+      all_choices <- gf_wide[!is.na(gf_wide[,input$findex_var]),'country_name']
+      intersect(all_choices,gf_regions)
+    } else { NULL }
+  })
+  output$countryUI <- renderUI({
+    selectInput('clist','Countries:',country_choices(),multiple=TRUE,
+                                   selected=last_countries())
+  })
+  output$regionUI <- renderUI({
+    if (input$panelID == 'Findex indicators') {
+      selectInput('rlist','Regions:',region_choices(),multiple=TRUE,
+                         selected=c('Low & middle income',
+                                    'Sub-Saharan Africa (developing only)'))
+    } else { NULL }
+  })
+  output$varUI <- renderUI({
+    if (input$panelID == 'Findex indicators') {
+      radioButtons('findex_var','Indicator:',findex_var_list)
+    } else if (input$panelID == 'Mobile adoption') {
+      radioButtons('gsma_var','Indicator:',
+                   c('Penetration' = 0,
+                     'Penetration, unique subscribers' = 1,
+                     'Annual growth rate' = 2,
+                     'Annual growth rate, unique subscribers' = 3))
+    } else { NULL }
+  })
+  
   output$gsmaPlot <- renderPlot({
     gsma_plot(input$clist,input$gsma_var)
   })
   output$elecPlot <- renderPlot({
     elec_plot(input$clist)
+  })
+  output$findexPlot <- renderPlot({
+    findex_plot(input$clist,input$rlist,input$findex_var)
   })
 
 })

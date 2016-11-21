@@ -1,60 +1,66 @@
+###############################################################################
 # Plots I could include:
+###############################################################################
 
 # Mobile money gap bar plots -- can easily do this for other countries
 # Mobile account histogram -- could do this with other Findex variables
-# Borrowed from financial inst -- could do other countries/Findex variables
 
 # Electrification & mobile -- would need DHS data for more countries
 # DHS geographic mobile coverage -- would require getting geotagged DHS data for 
 #   more countries and pre-computing
 
+###############################################################################
+# General quirks
+###############################################################################
 
+# Add more Findex indicators
+# Clean up weird annotation in Findex indicator names
+# More compact checkbox layout?
+# 'Cannot open the connection' error on read.csv in gsma_plot
+# why does text wrap on Findex indicators?
 
-# TODO: Find out -- is utils.R getting run twice?
-# TODO: Enable linear forecasts
-# TODO: Add a 'clear all' button
+###############################################################################
+# Header
+###############################################################################
 
+header <- dashboardHeader(
+  title = "PAYG data app (dev version)",
+  titleWidth=400
+)
 
-library(shiny)
-library(llamar)
-source('utils.R')
+###############################################################################
+# Sidebar
+###############################################################################
 
-# We only need countries with at least one DHS timepoint
-dhs_names <- dhs_all$CountryName %>% unique
+sidebar <- dashboardSidebar(
+  width=400,
+  htmlOutput('varUI'),
+  htmlOutput('countryUI'),
+  htmlOutput('regionUI')
+)
 
-shinyUI(fluidPage(
-  #### DHS household electrification
-  # titlePanel("Household electrification (from DHS)"),
-  # sidebarLayout(
-  #   sidebarPanel(
-  #     checkboxGroupInput('clist','Country:',dhs_names,inline=TRUE,
-  #                       selected=c('Nigeria','Uganda','Tanzania','Zambia',
-  #                                  'Rwanda'))
-  #   ),
-  #   mainPanel(
-  #     plotOutput("elecPlot")
-  #   )
-  # )
-  
-  #### GSMA mobile adoption
-  titlePanel("Mobile adoption (from GSMA)"),
-  sidebarLayout(
-    sidebarPanel(
-      checkboxGroupInput('clist','Country:',gsma_names,inline=TRUE,
-                         selected=c('Nigeria','Uganda','Tanzania','Zambia',
-                                    'Rwanda')),
-      radioButtons('gsma_var','Indicator:',
-                   c('Penetration' = 0,
-                     'Penetration, unique subscribers' = 1,
-                     'Annual growth rate' = 2,
-                     'Annual growth rate, unique subscribers' = 3))
-    ),
-    mainPanel(
-      plotOutput("gsmaPlot")
-      
-    )
+###############################################################################
+# Body
+###############################################################################
+
+body <- dashboardBody(
+  tabsetPanel(id='panelID',
+    tabPanel('Findex indicators',
+             plotOutput("findexPlot")),
+    tabPanel('Household electrification',
+             plotOutput("elecPlot")),
+    tabPanel('Mobile adoption',
+             plotOutput('gsmaPlot'))
   )
-  
-  ### TODO: add UI for findex plot
-  
-))
+)
+
+###############################################################################
+# Dashboard definition (main call)
+###############################################################################
+
+dashboardPage(
+  title = "PAYG data app (dev version)",  
+  header,
+  sidebar,
+  body
+)
