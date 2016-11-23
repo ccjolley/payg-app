@@ -12,8 +12,6 @@
 # General quirks
 ###############################################################################
 
-# Urban-rural gap plot for Lebanon looks sort of weird
-
 # Add more Findex indicators
 
 ###############################################################################

@@ -34,14 +34,14 @@ gf_w1 <- gf %>%
 just1 <- setdiff(gf_w1$series_name,gf_w2$series_name)
 
 gf_clean <- rbind(gf_w2,gf_w1[gf_w1$series_name %in% just1,]) %>%
-  select(country_name,series_name,series_code,mrv) %>%
+  dplyr::select(country_name,series_name,series_code,mrv) %>%
   mutate(mrv = mrv %>% as.character %>% as.numeric)
 
 gf_wide <- gf_clean %>% 
-  select(country_name,series_code,mrv) %>%
+  dplyr::select(country_name,series_code,mrv) %>%
   spread(series_code,mrv)
 
-key <- gf %>% select(series_name,series_code) %>% unique
+key <- gf %>% dplyr::select(series_name,series_code) %>% unique
 
 rm(gf,gf_w1,gf_w2,just1)
 

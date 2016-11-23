@@ -13,7 +13,7 @@ gap_plot <- function(cname) {
   if (is.null(cname)) { return (NULL) }
   gap <- gf_wide %>% 
     filter(country_name==cname) %>%
-    select(WP15163_4.1,WP11672.1,WP11674.1,WP11673.1,
+    dplyr::select(WP15163_4.1,WP11672.1,WP11674.1,WP11673.1,
            WP15172_4.1,WP14940_4.1,WP15161_1.1,
            WP15163_4.10,WP11672.10,WP11674.10,WP11673.10,
            WP15172_4.10,WP14940_4.10,WP15161_1.10) %>%
@@ -43,7 +43,7 @@ gap_plot <- function(cname) {
            plabel=ifelse(is.na(plabel),NA,paste0(plabel,'%'))) 
 
   plottext <- gap %>%
-    select(plabel,y=value,h,ur) %>%
+    dplyr::select(plabel,y=value,h,ur) %>%
     filter(!is.na(plabel)) %>%
     melt(id.vars=c('y','h')) %>%
     mutate(y=ifelse(variable=='ur',max(y)/70,y),
@@ -72,7 +72,7 @@ gap_plot('Lebanon') # Lebanon still looks sort of funny
 ###############################################################################
 
 tmp <- gf_wide %>% 
-  select(country_name,WP15163_4.1,WP11672.1,WP11674.1,WP11673.1,
+  dplyr::select(country_name,WP15163_4.1,WP11672.1,WP11674.1,WP11673.1,
          WP15172_4.1,WP14940_4.1,WP15161_1.1,
          WP15163_4.10,WP11672.10,WP11674.10,WP11673.10,
          WP15172_4.10,WP14940_4.10,WP15161_1.10) %>%

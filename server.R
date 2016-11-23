@@ -81,13 +81,13 @@ findex_plot <- function(clist,rlist,code='WP14887_7.1') {
   tmp$text <- round(tmp$value) %>% paste0('%')
   text_df <- tmp %>% 
     mutate(x=fct_reorder(country,plotorder)) %>%
-    select(country,text,value,x) %>% 
+    dplyr::select(country,text,value,x) %>% 
     mutate(text=as.character(text),country=as.character(country)) %>%
     melt(id.vars=c('value','x'),value.name='plotme') %>%
     mutate(hjust=ifelse(variable=='country',0,-0.1),
            y=ifelse(variable=='country',max(value)/40,value),
            plotme=as.character(plotme)) %>%
-    select(plotme,hjust,x,y)
+    dplyr::select(plotme,hjust,x,y)
   ggplot(tmp,aes(x=fct_reorder(country,plotorder),y=value)) +
     geom_bar(stat='identity',aes(fill=region)) +
     geom_text(data=text_df,aes(x=x,y=y,hjust=hjust,label=plotme),check_overlap=TRUE) +
@@ -158,7 +158,7 @@ shinyServer(function(input, output) {
   })
   output$varUI <- renderUI({
     if (input$panelID == 'Findex indicators') {
-      radioButtons('findex_var','Indicator:',findex_var_list)
+      selectInput('findex_var','Indicator:',findex_var_list)
     } else if (input$panelID == 'Mobile adoption') {
       radioButtons('gsma_var','Indicator:',
                    c('Penetration' = 0,
