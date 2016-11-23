@@ -102,6 +102,10 @@ findex_plot <- function(clist,rlist,code='WP14887_7.1') {
 
 #findex_plot(c('Finland','Burkina Faso'),c('Low & middle income','Sub-Saharan Africa (developing only)'))
 
+###############################################################################
+# Plot of urban-rural gap in selected Findex variables
+###############################################################################
+source('gap_plot.R')
 
 ###############################################################################
 # Here's where all the real action is
@@ -117,6 +121,8 @@ shinyServer(function(input, output) {
       dhs_names
     } else if (input$panelID == 'Mobile adoption') {
       gsma_names
+    } else if (input$panelID == 'Urban-rural gap') {
+      gap_names
     }
   })
   last_countries <- reactive({
@@ -133,8 +139,15 @@ shinyServer(function(input, output) {
     } else { NULL }
   })
   output$countryUI <- renderUI({
-    selectInput('clist','Countries:',country_choices(),multiple=TRUE,
-                                   selected=last_countries())
+    if (input$panelID %in% c('Findex indicators','Household electrification',
+                             'Mobile adoption')) {
+      selectInput('clist','Countries:',country_choices(),multiple=TRUE,
+                  selected=last_countries())
+    } else if (input$panelID == 'Urban-rural gap') {
+      selectInput('cname','Country/Region:',country_choices(),multiple=FALSE,
+                  selected=last_countries()[1])
+    }
+    
   })
   output$regionUI <- renderUI({
     if (input$panelID == 'Findex indicators') {
@@ -163,6 +176,9 @@ shinyServer(function(input, output) {
   })
   output$findexPlot <- renderPlot({
     findex_plot(input$clist,input$rlist,input$findex_var)
+  })
+  output$gapPlot <- renderPlot({
+    gap_plot(input$cname)
   })
 
 })

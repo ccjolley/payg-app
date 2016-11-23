@@ -2,7 +2,6 @@
 # Plots I could include:
 ###############################################################################
 
-# Mobile money gap bar plots -- can easily do this for other countries
 # Mobile account histogram -- could do this with other Findex variables
 
 # Electrification & mobile -- would need DHS data for more countries
@@ -13,11 +12,9 @@
 # General quirks
 ###############################################################################
 
+# Urban-rural gap plot for Lebanon looks sort of weird
+
 # Add more Findex indicators
-# Clean up weird annotation in Findex indicator names
-# More compact checkbox layout?
-# 'Cannot open the connection' error on read.csv in gsma_plot
-# why does text wrap on Findex indicators?
 
 ###############################################################################
 # Header
@@ -50,7 +47,9 @@ body <- dashboardBody(
     tabPanel('Household electrification',
              plotOutput("elecPlot")),
     tabPanel('Mobile adoption',
-             plotOutput('gsmaPlot'))
+             plotOutput('gsmaPlot')),
+    tabPanel('Urban-rural gap',
+             plotOutput('gapPlot'))
   )
 )
 
