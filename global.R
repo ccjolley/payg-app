@@ -22,11 +22,30 @@ gf_regions <- c('East Asia & Pacific (developing only)','Euro area',
                 'World')
 gf_countries <- setdiff(gf_wide$country_name,gf_regions)
 
-## TODO: This list can be made a lot longer; this is just to start out
+tmp <- c('WP11673.1',
+         'WP15172_4.1','WP14940_4.1','WP15161_1.1',
+         'WP15163_4.10','WP11672.10','WP11674.10','WP11673.10',
+         'WP15172_4.10','WP14940_4.10','WP15161_1.10')
+         
+    for (t in tmp) {
+         paste(t,key[key$series_code==t,'series_name']) %>% print
+         }
+
 findex_var_list <- c(
   	'Mobile money account' = 'WP15163_4.1',
     'Mobile phone used to pay bills' = 'WP11672.1',
-    'Mobile phone used to receive money' = 'WP11674.1'
+    'Mobile phone used to receive money' = 'WP11674.1',
+  	'Mobile phone used to send money' = 'WP11673.1',
+  	'Used a mobile phone to pay for school fees' = 'WP15172_4.1',
+  	'Used a mobile phone to pay utility bills' = 'WP14940_4.1',
+  	'Used an account to make a transaction through a mobile phone' = 'WP15161_1.1',
+  	'Mobile account, rural' = 'WP15163_4.10',
+  	'Mobile phone used to pay bills, rural' = 'WP11672.10',
+  	'Mobile phone used to receive money, rural' = 'WP11674.10',
+  	'Mobile phone used to send money, rural' = 'WP11673.10',
+  	'Used a mobile phone to pay for school fees, rural' = 'WP15172_4.10',
+  	'Used a mobile phone to pay utility bills, rural' = 'WP14940_4.10',
+  	'Used an account to make a transaction through a mobile phone, rural' = 'WP15161_1.10'
 )
 
 ###############################################################################
