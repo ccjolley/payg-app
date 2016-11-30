@@ -12,7 +12,6 @@
 # General quirks
 ###############################################################################
 
-# Add more Findex indicators
 
 ###############################################################################
 # Header
@@ -42,6 +41,8 @@ body <- dashboardBody(
   tabsetPanel(id='panelID',
     tabPanel('Findex indicators',
              plotOutput("findexPlot")),
+    tabPanel('Findex histogram',
+             plotOutput("findexHist")),
     tabPanel('Household electrification',
              plotOutput("elecPlot")),
     tabPanel('Mobile adoption',

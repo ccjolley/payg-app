@@ -108,6 +108,11 @@ findex_plot <- function(clist,rlist,code='WP14887_7.1') {
 source('gap_plot.R')
 
 ###############################################################################
+# Histogram of Findex variables
+###############################################################################
+source('findex_hist.R')
+
+###############################################################################
 # Here's where all the real action is
 ###############################################################################
 initial_countries <- c('Nigeria','Uganda','Tanzania','Zambia','Rwanda')
@@ -123,6 +128,8 @@ shinyServer(function(input, output) {
       gsma_names
     } else if (input$panelID == 'Urban-rural gap') {
       gap_names
+    } else if (input$panelID == 'Findex histogram') {
+      NULL
     }
   })
   last_countries <- reactive({
@@ -146,8 +153,9 @@ shinyServer(function(input, output) {
     } else if (input$panelID == 'Urban-rural gap') {
       selectInput('cname','Country/Region:',country_choices(),multiple=FALSE,
                   selected=last_countries()[1])
+    } else if (input$panelID == 'Findex histogram') {
+      NULL
     }
-    
   })
   output$regionUI <- renderUI({
     if (input$panelID == 'Findex indicators') {
@@ -157,7 +165,7 @@ shinyServer(function(input, output) {
     } else { NULL }
   })
   output$varUI <- renderUI({
-    if (input$panelID == 'Findex indicators') {
+    if (input$panelID %in% c('Findex indicators','Findex histogram')) {
       selectInput('findex_var','Indicator:',findex_var_list)
     } else if (input$panelID == 'Mobile adoption') {
       radioButtons('gsma_var','Indicator:',
@@ -179,6 +187,9 @@ shinyServer(function(input, output) {
   })
   output$gapPlot <- renderPlot({
     gap_plot(input$cname)
+  })
+  output$findexHist <- renderPlot({
+    findex_hist(input$findex_var)
   })
 
 })
