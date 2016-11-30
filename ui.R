@@ -2,8 +2,6 @@
 # Plots I could include:
 ###############################################################################
 
-# Mobile account histogram -- could do this with other Findex variables
-
 # Electrification & mobile -- would need DHS data for more countries
 # DHS geographic mobile coverage -- would require getting geotagged DHS data for 
 #   more countries and pre-computing
