@@ -191,5 +191,12 @@ shinyServer(function(input, output) {
   output$findexHist <- renderPlot({
     findex_hist(input$findex_var)
   })
-
+  gf_text <- 'Source: World Bank <a href="http://datatopics.worldbank.org/financialinclusion/">Global Findex</a>'
+  dhs_text <- 'Source: <a href="http://www.dhsprogram.com/">Demographic & Health Surveys</a>'
+  gsma_text <- 'Source: <a href="https://www.gsmaintelligence.com/">GSMA Intelligence</a>'
+  output$findex_footer1 <- renderText(gf_text)
+  output$findex_footer2 <- renderText(gf_text)
+  output$findex_footer3 <- renderText(gf_text)
+  output$dhs_footer <- renderText(dhs_text)
+  output$gsma_footer <- renderText(gsma_text)
 })

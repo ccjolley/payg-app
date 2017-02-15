@@ -38,15 +38,20 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(
   tabsetPanel(id='panelID',
     tabPanel('Findex indicators',
-             plotOutput("findexPlot")),
+             plotOutput("findexPlot"),
+             htmlOutput('findex_footer1')),
     tabPanel('Findex histogram',
-             plotOutput("findexHist")),
+             plotOutput("findexHist"),
+             htmlOutput('findex_footer2')),
     tabPanel('Household electrification',
-             plotOutput("elecPlot")),
+             plotOutput("elecPlot"),
+             htmlOutput('dhs_footer')),
     tabPanel('Mobile adoption',
-             plotOutput('gsmaPlot')),
+             plotOutput('gsmaPlot'),
+             htmlOutput('gsma_footer')),
     tabPanel('Urban-rural gap',
-             plotOutput('gapPlot'))
+             plotOutput('gapPlot'),
+             htmlOutput('findex_footer3'))
   )
 )
 
